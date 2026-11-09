@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10121b">
+<title>ClipGenius AI — Turn long videos into short clips</title>
+<style>
+:root{--bg:#0b0d14;--panel:#141824;--panel2:#1b2130;--line:#2b3345;--text:#f4f6fb;--muted:#9ba6ba;--accent:#8b7cff;--accent2:#4de0c1;--danger:#ff7b86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#28224d 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+.wrap{max-width:1100px;margin:auto;padding:28px 20px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:38px}.brand{font-weight:800;font-size:21px;letter-spacing:-.5px}.brand span{color:var(--accent)}.pill{border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--muted);font-size:12px}
+.hero{margin-bottom:28px}.eyebrow{color:var(--accent2);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.06;letter-spacing:-1.8px;margin:10px 0}.hero p{color:var(--muted);max-width:650px;margin:12px 0 0}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.card{background:rgba(20,24,36,.94);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 18px 50px #0002}.card h2{font-size:17px;margin:0 0 5px}.sub{color:var(--muted);font-size:13px;margin:0 0 17px}
+.drop{display:flex;min-height:175px;align-items:center;justify-content:center;text-align:center;border:1.5px dashed #48516a;border-radius:14px;background:#0e121d;padding:22px;cursor:pointer}.drop:hover{border-color:var(--accent)}.drop strong{display:block;font-size:15px}.drop small{display:block;color:var(--muted);margin-top:5px}.drop input{display:none}
+.videoBox{margin-top:14px;display:none}.videoBox video{width:100%;max-height:300px;background:#05060a;border-radius:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input,.field select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#0d111b;color:var(--text);outline:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:10px;padding:11px 16px;background:var(--accent);color:white;font-weight:700;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:#252c3c;border:1px solid var(--line)}.status{font-size:13px;color:var(--muted);margin-top:13px;min-height:20px}.progress{height:7px;background:#252c3c;border-radius:20px;overflow:hidden;margin-top:10px;display:none}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}
+.tip{border:1px solid #3b3b5b;background:#19192a;padding:13px;border-radius:12px;color:#c6c8e8;font-size:12px;margin-top:16px}.steps{display:grid;gap:13px}.step{display:flex;gap:12px;align-items:flex-start}.num{flex:0 0 27px;height:27px;border-radius:9px;background:#292544;color:#b8afff;display:grid;place-items:center;font-weight:800;font-size:12px}.step b{display:block;font-size:13px}.step span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+footer{margin-top:25px;color:#778198;font-size:12px;text-align:center}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:20px 14px 45px}.top{margin-bottom:28px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><div class="brand">✦ ClipGenius <span>AI</span></div><div class="pill">FREE MVP · BROWSER PROCESSING</div></header>
+  <section class="hero"><div class="eyebrow">Your video repurposing workspace</div><h1>Turn long videos into<br><span style="color:#a99fff">short vertical clips.</span></h1><p>Upload a video, choose a section, and export a 9:16 clip. This starter version runs processing in your browser; it does not upload your video to a server.</p></section>
+  <main class="grid">
+    <section class="card">
+      <h2>Create a clip</h2><p class="sub">Choose a video and set the part you want to keep.</p>
+      <label class="drop" for="file"><span><strong>＋ Choose a video</strong><small>MP4, MOV, WebM · Best with short test files</small></span><input id="file" type="file" accept="video/*"></label>
+      <div class="videoBox" id="videoBox"><video id="preview" controls playsinline></video></div>
+      <div class="row">
+        <div class="field"><label for="start">Start time (seconds)</label><input id="start" type="number" min="0" step=".1" value="0"></div>
+        <div class="field"><label for="end">End time (seconds)</label><input id="end" type="number" min="0" step=".1" value="30"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="ratio">Output format</label><select id="ratio"><option value="9:16">Vertical 9:16 (Reels / Shorts)</option><option value="1:1">Square 1:1</option><option value="16:9">Landscape 16:9</option></select></div>
+        <div class="field"><label for="fit">Framing</label><select id="fit"><option value="crop">Fill frame (crop sides)</option><option value="pad">Fit with blurred-free bars</option></select></div>
+      </div>
+      <div class="actions"><button class="btn" id="make" disabled>Make clip</button><button class="btn secondary" id="reset">Reset</button></div>
+      <div class="progress" id="progress"><div id="bar"></div></div><div class="status" id="status">Select a video to begin.</div>
+      <div class="actions" id="downloadArea" style="display:none"><a class="btn" id="download" download="clipgenius-clip.mp4" style="text-decoration:none">Download MP4</a></div>
+      <div class="tip">Privacy: your selected video is processed locally in this browser. Large videos may fail on phones because of memory limits. Start with a small MP4.</div>
+    </section>
+    <aside class="card">
+      <h2>How it works</h2><p class="sub">A simple first version, built to be extended.</p>
+      <div class="steps">
+        <div class="step"><div class="num">01</div><div><b>Upload your source video</b><span>Select a local video file from your device.</span></div></div>
+        <div class="step"><div class="num">02</div><div><b>Choose the clip duration</b><span>Set start and end times. Keep the first test under 30 seconds.</span></div></div>
+        <div class="step"><div class="num">03</div><div><b>Pick a social format</b><span>Export vertical, square, or landscape video.</span></div></div>
+        <div class="step"><div class="num">04</div><div><b>Download your clip</b><span>Save the MP4 to your device and publish it.</span></div></div>
+      </div>
+      <div class="tip"><b>Not included yet:</b> automatic highlight detection, word-level animated captions, face tracking, cloud storage, accounts, and subscription billing. Those need separate implementation and, for dependable AI processing, server compute.</div>
+    </aside>
+  </main>
+  <footer>ClipGenius AI · Independent starter project · Not affiliated with Opus Clip</footer>
+</div>
+<script type="module">
+import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+import { fetchFile, toBlobURL } from 'https://unpkg.com/@ffmpeg/util@0.12.2/dist/esm/index.js';
+const $ = id => document.getElementById(id);
+const ffmpeg = new FFmpeg();
+let loaded = false, inputUrl = null, outputUrl = null, inputName = 'input.mp4';
+const status = t => $('status').textContent = t;
+const fileInput = $('file');
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files?.[0]; if (!file) return;
+  if (inputUrl) URL.revokeObjectURL(inputUrl);
+  inputUrl = URL.createObjectURL(file); inputName = file.name || 'input.mp4';
+  $('preview').src = inputUrl; $('videoBox').style.display = 'block';
+  $('make').disabled = false; $('downloadArea').style.display = 'none';
+  $('start').value = 0; $('end').value = 30;
+  $('preview').onloadedmetadata = () => { $('end').value = Math.min(30, Math.floor($('preview').duration)); status(`Loaded ${file.name} · ${Math.round(file.size/1024/1024*10)/10} MB · ${$('preview').duration.toFixed(1)} sec`); };
+});
+$('reset').addEventListener('click', () => { fileInput.value=''; $('videoBox').style.display='none'; $('preview').removeAttribute('src'); $('make').disabled=true; $('downloadArea').style.display='none'; $('progress').style.display='none'; status('Select a video to begin.'); if(inputUrl)URL.revokeObjectURL(inputUrl); if(outputUrl)URL.revokeObjectURL(outputUrl); });
+$('make').addEventListener('click', async () => {
+  const file=fileInput.files?.[0]; if(!file)return;
+  const start=Number($('start').value), end=Number($('end').value);
+  if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start||end>$('preview').duration){status('Check the start and end times. End must be after start and within the video.');return;}
+  const btn=$('make'); btn.disabled=true; $('downloadArea').style.display='none'; $('progress').style.display='block'; $('bar').style.width='0%';
+  try {
+    if(!loaded){
+      status('Loading video processing engine (first run only)…');
+      const base='https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      await ffmpeg.load({coreURL:await toBlobURL(`${base}/ffmpeg-core.js`,'text/javascript'),wasmURL:await toBlobURL(`${base}/ffmpeg-core.wasm`,'application/wasm')});
+      loaded=true;
+    }
+    ffmpeg.on('progress', ({progress}) => $('bar').style.width=`${Math.max(0,Math.min(100,progress*100)).toFixed(0)}%`);
+    status('Preparing video…');
+    const ext=(inputName.split('.').pop()||'mp4').replace(/[^a-z0-9]/gi,'').toLowerCase();
+    const inFile=`source.${ext||'mp4'}`;
+    await ffmpeg.writeFile(inFile, await fetchFile(file));
+    const ratio=$('ratio').value, fit=$('fit').value;
+    const [w,h]=ratio==='9:16'?[720,1280]:ratio==='1:1'?[1080,1080]:[1280,720];
+    const vf=fit==='crop'?`scale=${w}:${h}:force_original_aspect_ratio=increase,crop=${w}:${h},setsar=1`:`scale=${w}:${h}:force_original_aspect_ratio=decrease,pad=${w}:${h}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1`;
+    status('Rendering your clip in this browser. Keep this tab open…');
+    await ffmpeg.exec(['-ss',String(start),'-i',inFile,'-t',String(end-start),'-vf',vf,'-c:v','libx264','-preset','ultrafast','-crf','24','-c:a','aac','-b:a','128k','-movflags','+faststart','clipgenius.mp4']);
+    const data=await ffmpeg.readFile('clipgenius.mp4');
+    if(outputUrl)URL.revokeObjectURL(outputUrl);
+    outputUrl=URL.createObjectURL(new Blob([data.buffer],{type:'video/mp4'}));
+    $('download').href=outputUrl; $('downloadArea').style.display='flex'; $('bar').style.width='100%';
+    status('Your clip is ready. Download the MP4 below.');
+    await ffmpeg.deleteFile(inFile); await ffmpeg.deleteFile('clipgenius.mp4');
+  } catch(e){console.error(e);status('Processing failed. Try a smaller MP4, a shorter clip, or a desktop browser.');}
+  finally{btn.disabled=false;}
+});
+</script>
+</body></html>
